@@ -1,0 +1,221 @@
+/* FloraElegance Admin Panel — scoped dark theme */
+
+.admin-panel.admin-light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.admin-panel.admin-dark {
+  background-color: #0b1220;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* Surfaces */
+.admin-panel.admin-dark .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.admin-panel.admin-dark .bg-slate-50,
+.admin-panel.admin-dark .bg-slate-50\/50,
+.admin-panel.admin-dark .bg-slate-50\/65,
+.admin-panel.admin-dark .bg-slate-50\/40 {
+  background-color: #0f172a !important;
+}
+
+.admin-panel.admin-dark .bg-slate-100,
+.admin-panel.admin-dark .hover\:bg-slate-100:hover {
+  background-color: #334155 !important;
+}
+
+.admin-panel.admin-dark .hover\:bg-slate-50:hover,
+.admin-panel.admin-dark .hover\:bg-slate-50\/50:hover,
+.admin-panel.admin-dark .hover\:bg-slate-50\/40:hover {
+  background-color: #1e293b !important;
+}
+
+/* Colored alert / stat cards — keep hue, darken base */
+.admin-panel.admin-dark .bg-emerald-50 { background-color: rgba(6, 78, 59, 0.35) !important; }
+.admin-panel.admin-dark .bg-rose-50 { background-color: rgba(136, 19, 55, 0.3) !important; }
+.admin-panel.admin-dark .bg-amber-50 { background-color: rgba(120, 53, 15, 0.35) !important; }
+.admin-panel.admin-dark .bg-indigo-50 { background-color: rgba(49, 46, 129, 0.35) !important; }
+.admin-panel.admin-dark .bg-primary-50 { background-color: rgba(21, 128, 61, 0.25) !important; }
+.admin-panel.admin-dark .bg-blue-50 { background-color: rgba(30, 58, 138, 0.3) !important; }
+
+.admin-panel.admin-dark .border-emerald-100,
+.admin-panel.admin-dark .border-emerald-200 { border-color: rgba(52, 211, 153, 0.35) !important; }
+.admin-panel.admin-dark .border-rose-100,
+.admin-panel.admin-dark .border-rose-200 { border-color: rgba(251, 113, 133, 0.35) !important; }
+.admin-panel.admin-dark .border-amber-100,
+.admin-panel.admin-dark .border-amber-200 { border-color: rgba(251, 191, 36, 0.35) !important; }
+.admin-panel.admin-dark .border-indigo-100 { border-color: rgba(129, 140, 248, 0.35) !important; }
+.admin-panel.admin-dark .border-primary-100,
+.admin-panel.admin-dark .border-primary-150,
+.admin-panel.admin-dark .border-primary-200 { border-color: rgba(74, 222, 128, 0.3) !important; }
+
+/* Typography */
+.admin-panel.admin-dark .text-slate-950,
+.admin-panel.admin-dark .text-slate-900,
+.admin-panel.admin-dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+.admin-panel.admin-dark .text-slate-700,
+.admin-panel.admin-dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+.admin-panel.admin-dark .text-slate-500,
+.admin-panel.admin-dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.admin-panel.admin-dark .text-slate-300 {
+  color: #64748b !important;
+}
+
+/* Borders */
+.admin-panel.admin-dark .border-slate-50,
+.admin-panel.admin-dark .border-slate-100,
+.admin-panel.admin-dark .border-slate-150,
+.admin-panel.admin-dark .border-slate-200,
+.admin-panel.admin-dark .border-slate-250,
+.admin-panel.admin-dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+
+.admin-panel.admin-dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+
+/* Tabs (inactive) */
+.admin-panel.admin-dark .bg-slate-100.text-slate-600 {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+.admin-panel.admin-dark button.bg-slate-100 {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+.admin-panel.admin-dark button.bg-slate-100:hover {
+  background-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Form fields */
+.admin-panel.admin-dark input,
+.admin-panel.admin-dark textarea,
+.admin-panel.admin-dark select {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+.admin-panel.admin-dark input::placeholder,
+.admin-panel.admin-dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+.admin-panel.admin-dark input:focus,
+.admin-panel.admin-dark textarea:focus,
+.admin-panel.admin-dark select:focus {
+  border-color: #22c55e !important;
+  background-color: #0f172a !important;
+}
+
+/* Tables */
+.admin-panel.admin-dark thead.bg-slate-50 {
+  background-color: #0f172a !important;
+}
+
+.admin-panel.admin-dark tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+}
+
+/* Modals */
+.admin-panel.admin-dark .bg-slate-900\/60 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Shadows — softer on dark */
+.admin-panel.admin-dark .shadow-sm,
+.admin-panel.admin-dark .shadow-md,
+.admin-panel.admin-dark .shadow-lg,
+.admin-panel.admin-dark .shadow-xl,
+.admin-panel.admin-dark .shadow-2xl {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* SVG charts — axis labels */
+.admin-panel.admin-dark .fill-slate-500,
+.admin-panel.admin-dark .fill-slate-400 {
+  fill: #94a3b8 !important;
+}
+
+.admin-panel.admin-dark .fill-slate-800 {
+  fill: #f1f5f9 !important;
+}
+
+/* Scrollbar in admin dark */
+.admin-panel.admin-dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.admin-panel.admin-dark ::-webkit-scrollbar-thumb {
+  border-color: #0f172a;
+  background: #334155;
+}
+
+.admin-panel.admin-dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Admin header strip */
+.admin-panel .admin-topbar {
+  border-color: #e2e8f0;
+}
+
+.admin-panel.admin-dark .admin-topbar {
+  border-color: #334155;
+}
+
+.admin-panel .admin-tabs-wrap {
+  border-color: #e2e8f0;
+}
+
+.admin-panel.admin-dark .admin-tabs-wrap {
+  border-color: #334155;
+  background-color: rgba(11, 18, 32, 0.92) !important;
+}
+
+.admin-panel.admin-dark .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.35) !important;
+}
+
+.admin-panel.admin-dark .border-red-200 {
+  border-color: rgba(248, 113, 113, 0.4) !important;
+}
+
+.admin-panel.admin-dark .text-red-700,
+.admin-panel.admin-dark .text-red-500 {
+  color: #fca5a5 !important;
+}
+
+.admin-panel.admin-dark .text-emerald-800 {
+  color: #6ee7b7 !important;
+}
+
+.admin-panel.admin-dark .hover\:bg-primary-50:hover {
+  background-color: rgba(21, 128, 61, 0.2) !important;
+}
+
+.admin-panel.admin-dark .hover\:bg-red-50:hover {
+  background-color: rgba(127, 29, 29, 0.25) !important;
+}
+
+.admin-panel.admin-dark img {
+  opacity: 0.95;
+}
