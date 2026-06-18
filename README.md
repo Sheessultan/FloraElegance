@@ -363,8 +363,8 @@ Each plant can have **rich content**:
 
 | Service         | Purpose                 | Action                                |
 | --------------- | ----------------------- | ------------------------------------- |
-| **Hostinger**   | Website + MySQL hosting | Buy plan, upload files, SSL           |
-| **Domain**      | yourbrand.com           | Connect to Hostinger                  |
+| **Hostinger**   | Website + MySQL hosting | Subdomain: `floraelegance.codewavestudio.space` — see `plant/backend/HOSTINGER-DEPLOY.md` |
+| **Domain**      | codewavestudio.space    | Subdomain `floraelegance` connected in hPanel |
 | **Razorpay**    | Online payments         | Business KYC, live API keys in `.env` |
 | **SSL (HTTPS)** | Secure checkout         | Enable in Hostinger (free)            |
 

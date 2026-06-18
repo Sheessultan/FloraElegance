@@ -2,7 +2,7 @@
 
 This guide is **for running the project on your local computer only** (`http://localhost`).
 
-For live hosting on Hostinger, see: `backend/HOSTINGER-DEPLOY.md`
+For live hosting on Hostinger, see: `plant/backend/HOSTINGER-DEPLOY.md`
 
 ---
 
@@ -170,12 +170,15 @@ npm run dev
 
 ### Method B — Production build (XAMPP URL, like a mini “live” setup)
 
-Use this when you want URLs similar to deployment: `/plant/frontend/dist/`
+Use this when you want to test a production build locally (optional):
 
 ```powershell
 cd C:\xampp\htdocs\plant\frontend
+# Temporarily set VITE_BASE_PATH=/plant/frontend/dist/ in a local .env.production.local, then:
 npm run build
 ```
+
+For **Hostinger live deployment**, see `plant/backend/HOSTINGER-DEPLOY.md` — production uses subdomain root (`/`).
 
 Then open in the browser:
 
