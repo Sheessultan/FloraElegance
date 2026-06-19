@@ -1,6 +1,0 @@
-# Allow public access to uploaded images
-<IfModule mod_headers.c>
-  Header set Access-Control-Allow-Origin "*"
-</IfModule>
-
-Options -Indexes

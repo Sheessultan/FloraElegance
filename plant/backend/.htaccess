@@ -1,8 +1,0 @@
-# Block direct access to environment and config files
-<FilesMatch "^(\.env|\.env\..*)$">
-  Require all denied
-</FilesMatch>
-
-<FilesMatch "^(env\.php|db\.php|jwt\.php|commerce\.php)$">
-  Require all denied
-</FilesMatch>

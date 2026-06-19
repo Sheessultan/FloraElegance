@@ -1,0 +1,10 @@
+# Block PHP execution in uploads — images only
+<FilesMatch "\.(php|phtml|php3|php4|php5|phar)$">
+  Require all denied
+</FilesMatch>
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>
