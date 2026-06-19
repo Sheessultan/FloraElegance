@@ -62,13 +62,10 @@ export const AuthProvider = ({ children }) => {
 
       if (response.data.success) {
         const { token: jwtToken, user: userData } = response.data;
-
         setToken(jwtToken);
         setUser(userData);
-
         localStorage.setItem('plant_token', jwtToken);
         localStorage.setItem('plant_user', JSON.stringify(userData));
-
         axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
         return { success: true };
       }
@@ -76,14 +73,86 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       return {
         success: false,
-        message: err.response?.data?.message || 'Login failed. Please check your credentials.'
+        message: err.response?.data?.message || 'Login failed. Please check your credentials.',
       };
     }
   };
 
-  const signup = async (name, email, password) => {
+  const sendLoginOtp = async (email) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/signup.php`, { name, email, password });
+      const response = await axios.post(`${API_BASE_URL}/login.php`, {
+        action: 'send_otp',
+        email,
+      });
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        wait_seconds: response.data.wait_seconds,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || 'Failed to send verification code.',
+        wait_seconds: err.response?.data?.wait_seconds,
+      };
+    }
+  };
+
+  const loginWithOtp = async (email, otp) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login.php`, {
+        action: 'otp',
+        email,
+        otp,
+      });
+
+      if (response.data.success) {
+        const { token: jwtToken, user: userData } = response.data;
+        setToken(jwtToken);
+        setUser(userData);
+        localStorage.setItem('plant_token', jwtToken);
+        localStorage.setItem('plant_user', JSON.stringify(userData));
+        axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
+        return { success: true };
+      }
+      return { success: false, message: response.data.message };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || 'OTP verification failed.',
+      };
+    }
+  };
+
+  const sendSignupOtp = async (name, email) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/signup.php`, {
+        action: 'send_otp',
+        name,
+        email,
+      });
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        wait_seconds: response.data.wait_seconds,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || 'Failed to send verification code.',
+        wait_seconds: err.response?.data?.wait_seconds,
+      };
+    }
+  };
+
+  const signup = async (name, email, password, otp) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/signup.php`, {
+        name,
+        email,
+        password,
+        otp,
+      });
 
       if (response.data.success) {
         return { success: true, message: response.data.message };
@@ -92,7 +161,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       return {
         success: false,
-        message: err.response?.data?.message || 'Registration failed. Try again.'
+        message: err.response?.data?.message || 'Registration failed. Try again.',
       };
     }
   };
@@ -100,7 +169,21 @@ export const AuthProvider = ({ children }) => {
   const isAdmin = () => user && user.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, updateUser, isAdmin }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        loginWithOtp,
+        sendLoginOtp,
+        signup,
+        sendSignupOtp,
+        logout,
+        updateUser,
+        isAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

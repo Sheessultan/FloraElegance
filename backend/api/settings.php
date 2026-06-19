@@ -3,6 +3,7 @@
 
 require_once "../config/db.php";
 require_once "../config/jwt.php";
+require_once "../config/mail.php";
 
 // SELF-HEALING DATABASE MIGRATION FOR SITE SETTINGS
 try {
@@ -44,6 +45,9 @@ try {
 } catch (PDOException $e) {
     // Fail silently
 }
+
+mailEnsureSchema($conn);
+mailEnsureSettings($conn);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -87,7 +91,23 @@ switch($method) {
                 "shipping_min_order" => "0",
                 "low_stock_threshold" => "5",
                 "auto_disable_out_of_stock" => "1",
-                "inventory_show_out_of_stock" => "0"
+                "inventory_show_out_of_stock" => "0",
+                "smtp_enabled" => "1",
+                "smtp_host" => env('SMTP_HOST', 'smtp.hostinger.com'),
+                "smtp_port" => env('SMTP_PORT', '587'),
+                "smtp_encryption" => env('SMTP_ENCRYPTION', 'tls'),
+                "smtp_username" => env('SMTP_USER', ''),
+                "smtp_password" => env('SMTP_PASS', ''),
+                "smtp_from_email" => env('SMTP_FROM_EMAIL', env('SMTP_USER', '')),
+                "smtp_from_name" => env('SMTP_FROM_NAME', 'FloraElegance'),
+                "smtp_reply_to" => env('SMTP_REPLY_TO', ''),
+                "email_notify_orders" => "1",
+                "email_notify_inquiries" => "1",
+                "email_notify_reviews" => "1",
+                "email_notify_admin" => "1",
+                "email_notify_status" => "1",
+                "email_notify_tracking" => "1",
+                "email_notify_security" => "1",
             ];
             foreach ($defaults as $k => $v) {
                 if (!isset($rows[$k])) {
@@ -95,6 +115,24 @@ switch($method) {
                     $ins->execute([$k, $v]);
                     $rows[$k] = $v;
                 }
+            }
+
+            // Hide SMTP credentials from public API responses
+            $userData = JWT::authenticate();
+            $isAdmin = $userData && ($userData['role'] ?? '') === 'admin';
+            if (!$isAdmin) {
+                $hiddenKeys = [
+                    'smtp_host', 'smtp_port', 'smtp_encryption', 'smtp_username', 'smtp_password',
+                    'smtp_from_email', 'smtp_from_name', 'smtp_reply_to', 'smtp_enabled',
+                    'email_notify_orders', 'email_notify_inquiries', 'email_notify_reviews',
+                    'email_notify_admin', 'email_notify_status', 'email_notify_tracking', 'email_notify_security',
+                ];
+                foreach ($hiddenKeys as $hk) {
+                    unset($rows[$hk]);
+                }
+            } elseif (isset($rows['smtp_password']) && $rows['smtp_password'] !== '') {
+                $rows['smtp_password_set'] = '1';
+                unset($rows['smtp_password']);
             }
             
             echo json_encode([
@@ -135,9 +173,13 @@ switch($method) {
         try {
             $conn->beginTransaction();
             $stmt = $conn->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+
+            // Preserve SMTP password if admin submits empty (unchanged)
+            if (array_key_exists('smtp_password', $input) && trim((string) $input['smtp_password']) === '') {
+                unset($input['smtp_password']);
+            }
             
             foreach ($input as $key => $value) {
-                // Safely sanitize key and value
                 $stmt->execute([$key, $value, $value]);
             }
             

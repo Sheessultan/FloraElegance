@@ -3,6 +3,7 @@
 
 require_once "../config/db.php";
 require_once "../config/jwt.php";
+require_once "../config/notifications.php";
 
 $userData = JWT::authenticate();
 if (!$userData) {
@@ -117,6 +118,7 @@ switch ($method) {
                 $newHash = password_hash($input['new_password'], PASSWORD_BCRYPT);
                 $updatePwdStmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
                 $updatePwdStmt->execute([$newHash, $userId]);
+                notifyPasswordChanged($conn, $userId);
             }
             
             // Update profile info (shipping addresses live in user_addresses table)

@@ -1,6 +1,7 @@
 <?php
 require_once "../config/db.php";
 require_once "../config/jwt.php";
+require_once "../config/notifications.php";
 
 // Auto-create reviews table if missing
 try {
@@ -88,7 +89,14 @@ switch ($method) {
                 min(5, max(1, intval($input['rating']))),
                 $input['comment']
             ]);
-            echo json_encode(["success" => true, "message" => "Review submitted successfully.", "id" => $conn->lastInsertId()]);
+            $reviewId = (int) $conn->lastInsertId();
+
+            $productStmt = $conn->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+            $productStmt->execute([intval($input['product_id'])]);
+            $productName = $productStmt->fetchColumn() ?: 'Product #' . intval($input['product_id']);
+            notifyReviewAdmin($conn, $productName, $userName, min(5, max(1, intval($input['rating']))), $input['comment'], $reviewId);
+
+            echo json_encode(["success" => true, "message" => "Review submitted successfully.", "id" => $reviewId]);
         } catch (PDOException $e) {
             http_response_code(500);
             echo json_encode(["success" => false, "message" => $e->getMessage()]);

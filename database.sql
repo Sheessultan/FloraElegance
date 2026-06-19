@@ -25,6 +25,7 @@ CREATE TABLE `users` (
   `is_banned` TINYINT(1) NOT NULL DEFAULT 0,
   `ban_reason` VARCHAR(255) DEFAULT NULL,
   `banned_at` TIMESTAMP NULL DEFAULT NULL,
+  `email_verified` TINYINT(1) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -167,6 +168,21 @@ CREATE TABLE `order_items` (
   `price` DECIMAL(10,2) NOT NULL,
   FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- EMAIL OTP (signup & login verification)
+-- -----------------------------------------------------------------------------
+CREATE TABLE `email_otps` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `email` VARCHAR(100) NOT NULL,
+  `otp_hash` VARCHAR(255) NOT NULL,
+  `purpose` ENUM('signup','login') NOT NULL,
+  `attempts` INT NOT NULL DEFAULT 0,
+  `expires_at` DATETIME NOT NULL,
+  `verified_at` DATETIME DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_email_otp_lookup` (`email`, `purpose`, `expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------------------------
@@ -330,7 +346,23 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('invoice_support_email', 'support@floraelegance.com'),
 ('invoice_support_phone', '+91-9876543210'),
 ('invoice_gst_note', ''),
-('invoice_primary_color', '#059669');
+('invoice_primary_color', '#059669'),
+('smtp_enabled', '1'),
+('smtp_host', 'smtp.hostinger.com'),
+('smtp_port', '587'),
+('smtp_encryption', 'tls'),
+('smtp_username', ''),
+('smtp_password', ''),
+('smtp_from_email', ''),
+('smtp_from_name', 'FloraElegance'),
+('smtp_reply_to', ''),
+('email_notify_orders', '1'),
+('email_notify_inquiries', '1'),
+('email_notify_reviews', '1'),
+('email_notify_admin', '1'),
+('email_notify_status', '1'),
+('email_notify_tracking', '1'),
+('email_notify_security', '1');
 
 -- =============================================================================
 -- END OF SCHEMA

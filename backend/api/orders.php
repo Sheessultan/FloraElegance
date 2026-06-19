@@ -4,6 +4,7 @@
 require_once "../config/db.php";
 require_once "../config/jwt.php";
 require_once "../config/commerce.php";
+require_once "../config/notifications.php";
 
 // Razorpay Credentials - Safely loaded from environment variables
 define('RAZORPAY_KEY_ID', env('RAZORPAY_KEY_ID', 'rzp_test_w3hP8z2jN1245A')); 
@@ -300,6 +301,8 @@ switch ($method) {
                     $clearStmt->execute([$userId]);
 
                     $conn->commit();
+                    notifyOrderPlacedCustomer($conn, $orderId, false);
+                    notifyOrderPlacedAdmin($conn, $orderId);
                     echo json_encode([
                         "success" => true,
                         "message" => "Payment verified and order placed successfully!"
@@ -388,6 +391,13 @@ switch ($method) {
                     isset($input['tracking_status']) ? trim($input['tracking_status']) : null,
                     $orderId
                 ]);
+                notifyOrderTracking(
+                    $conn,
+                    $orderId,
+                    isset($input['tracking_number']) ? trim($input['tracking_number']) : '',
+                    isset($input['tracking_carrier']) ? trim($input['tracking_carrier']) : '',
+                    isset($input['tracking_status']) ? trim($input['tracking_status']) : ''
+                );
                 echo json_encode(["success" => true, "message" => "Tracking details saved."]);
             } catch (PDOException $e) {
                 http_response_code(500);
@@ -435,6 +445,7 @@ switch ($method) {
                 }
 
                 $conn->commit();
+                notifyOrderStatus($conn, $orderId, $status);
                 echo json_encode(["success" => true, "message" => "Order status updated to " . $status]);
             } catch (PDOException $e) {
                 if ($conn->inTransaction()) $conn->rollBack();
@@ -585,6 +596,8 @@ switch ($method) {
                 $clearStmt = $conn->prepare("DELETE FROM cart WHERE user_id = ?");
                 $clearStmt->execute([$userId]);
                 $conn->commit();
+                notifyOrderPlacedCustomer($conn, $orderId, true);
+                notifyOrderPlacedAdmin($conn, $orderId);
                 echo json_encode([
                     "success" => true,
                     "message" => "COD order placed successfully. Pay when your plants arrive.",

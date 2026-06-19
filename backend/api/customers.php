@@ -2,6 +2,7 @@
 require_once "../config/db.php";
 require_once "../config/jwt.php";
 require_once "../config/commerce.php";
+require_once "../config/notifications.php";
 
 commerceEnsureSchema($conn);
 
@@ -27,6 +28,7 @@ if ($method === 'POST' && isset($_GET['action'])) {
         $reason = trim($input['reason'] ?? 'Blocked by admin');
         $stmt = $conn->prepare("UPDATE users SET is_banned = 1, ban_reason = ?, banned_at = NOW() WHERE id = ? AND role = 'customer'");
         $stmt->execute([$reason, $userId]);
+        notifyAccountBanned($conn, $userId, $reason);
         echo json_encode(['success' => true, 'message' => 'Customer blocked.']);
         exit();
     }

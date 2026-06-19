@@ -3,6 +3,7 @@
 
 require_once "../config/db.php";
 require_once "../config/jwt.php";
+require_once "../config/notifications.php";
 
 // SELF-HEALING DATABASE MIGRATION FOR CONTACT INQUIRIES
 try {
@@ -54,10 +55,15 @@ switch($method) {
             $stmt = $conn->prepare("INSERT INTO contact_inquiries (name, email, subject, message, status) VALUES (?, ?, ?, ?, 'unread')");
             $stmt->execute([$name, $email, $subject, $message]);
             
+            $inquiryId = (int) $conn->lastInsertId();
+
+            notifyInquiryCustomer($conn, $name, $email, $subject);
+            notifyInquiryAdmin($conn, $name, $email, $subject, $message, $inquiryId);
+            
             echo json_encode([
                 "success" => true,
-                "message" => "Inquiry successfully recorded.",
-                "id" => $conn->lastInsertId()
+                "message" => "Inquiry successfully recorded. A confirmation email has been sent.",
+                "id" => $inquiryId
             ]);
         } catch (PDOException $e) {
             http_response_code(500);

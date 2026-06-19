@@ -5,7 +5,7 @@ import {
   ShieldAlert, Leaf, Layers, ShoppingBag, DollarSign, Plus, Edit2, 
   Trash2, RefreshCw, X, Check, ArrowRight, ShieldCheck, ChevronDown, ChevronUp,
   Eye, Calendar, CheckCircle, Star, EyeOff, Filter, PhoneCall, Download, DownloadCloud,
-  Search, Truck, MapPin, CreditCard, Banknote, Package, CheckSquare, Square
+  Search, Truck, MapPin, CreditCard, Banknote, Package, CheckSquare, Square, Mail
 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import { generateInvoice } from '../utils/invoiceGenerator';
@@ -709,6 +709,30 @@ const AdminDashboard = () => {
       handleAlertTimeout();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save website coordinates.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    setActionLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const testTo = siteSettings.contact_email;
+      if (!testTo) {
+        setError('Set a Support Email in Contact settings first.');
+        setActionLoading(false);
+        return;
+      }
+      const res = await axios.post(`${API_BASE_URL}/mail_test.php`, { email: testTo });
+      if (res.data.success) {
+        setSuccess(res.data.message || 'Test email sent.');
+      }
+      handleAlertTimeout();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send test email. Check SMTP settings.');
+      handleAlertTimeout();
     } finally {
       setActionLoading(false);
     }
@@ -2557,6 +2581,86 @@ const AdminDashboard = () => {
                   className="w-full bg-white border border-slate-200 focus:border-primary-500 rounded-xl px-4 py-3 outline-none font-medium shadow-inner"
                   placeholder="499"
                 />
+              </div>
+            </div>
+
+            {/* Email & SMTP */}
+            <div className="space-y-4 p-4 sm:p-5 bg-emerald-50/40 border border-emerald-100 rounded-2xl w-full">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-emerald-600" /> Email & SMTP Notifications
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-1">OTP verification, order emails, inquiry alerts — powered by your SMTP server.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTestEmail}
+                  disabled={actionLoading}
+                  className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-full shadow disabled:opacity-50"
+                >
+                  Send Test Email
+                </button>
+              </div>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={siteSettings.smtp_enabled !== '0'} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_enabled: e.target.checked ? '1' : '0' })} className="h-4 w-4 rounded accent-emerald-600" />
+                <span className="text-sm font-bold text-slate-700">Enable email notifications & OTP</span>
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">SMTP Host</label>
+                  <input type="text" value={siteSettings.smtp_host || ''} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_host: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" placeholder="smtp.hostinger.com" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">SMTP Port</label>
+                  <input type="number" value={siteSettings.smtp_port || '587'} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_port: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">Encryption</label>
+                  <select value={siteSettings.smtp_encryption || 'tls'} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_encryption: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm">
+                    <option value="tls">TLS (587)</option>
+                    <option value="ssl">SSL (465)</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">SMTP Username</label>
+                  <input type="text" value={siteSettings.smtp_username || ''} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_username: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" placeholder="noreply@yourdomain.com" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">SMTP Password</label>
+                  <input type="password" value={siteSettings.smtp_password || ''} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_password: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" placeholder={siteSettings.smtp_password_set === '1' ? '•••••••• (unchanged if blank)' : 'App password'} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">From Email</label>
+                  <input type="email" value={siteSettings.smtp_from_email || ''} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_from_email: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">From Name</label>
+                  <input type="text" value={siteSettings.smtp_from_name || 'FloraElegance'} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_from_name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs uppercase tracking-wider text-slate-400">Reply-To (optional)</label>
+                  <input type="email" value={siteSettings.smtp_reply_to || ''} onChange={(e) => setSiteSettings({ ...siteSettings, smtp_reply_to: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                {[
+                  ['email_notify_orders', 'Order confirmations (customer)'],
+                  ['email_notify_admin', 'New orders & inquiries (admin)'],
+                  ['email_notify_status', 'Order status updates'],
+                  ['email_notify_tracking', 'Tracking updates'],
+                  ['email_notify_inquiries', 'Contact form auto-reply'],
+                  ['email_notify_reviews', 'New review alerts'],
+                  ['email_notify_security', 'Welcome, login & security alerts'],
+                ].map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
+                    <input type="checkbox" checked={siteSettings[key] !== '0'} onChange={(e) => setSiteSettings({ ...siteSettings, [key]: e.target.checked ? '1' : '0' })} className="h-3.5 w-3.5 rounded accent-emerald-600" />
+                    {label}
+                  </label>
+                ))}
               </div>
             </div>
 
