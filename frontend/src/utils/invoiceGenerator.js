@@ -40,7 +40,7 @@ export const generateInvoice = (order, siteSettings = {}) => {
       <meta charset="UTF-8">
       <title>Invoice ${invNo}</title>
       <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; margin: 0; }
+        body { font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; margin: 0; }
         .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); font-size: 16px; line-height: 24px; }
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid ${primary}; padding-bottom: 20px; }
         .header-left h1 { margin: 0; color: ${primary}; font-size: 36px; text-transform: uppercase; letter-spacing: 2px; }

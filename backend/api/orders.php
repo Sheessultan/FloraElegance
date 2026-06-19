@@ -20,7 +20,15 @@ if (!$userData) {
     exit();
 }
 
-$userId = $userData['id'];
+$userId = isset($userData['id']) ? (int) $userData['id'] : 0;
+if ($userId <= 0) {
+    http_response_code(401);
+    echo json_encode([
+        "success" => false,
+        "message" => "Invalid session. Please log in again."
+    ]);
+    exit();
+}
 $method = $_SERVER['REQUEST_METHOD'];
 
 commerceEnsureSchema($conn);
@@ -454,6 +462,13 @@ switch ($method) {
         try {
             $conn->beginTransaction();
 
+            // Ensure the authenticated user exists (stale JWT / deleted account)
+            $userCheck = $conn->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
+            $userCheck->execute([$userId]);
+            if (!$userCheck->fetch()) {
+                throw new Exception("Your account was not found. Please log out and sign in again.");
+            }
+
             // Fetch cart items to calculate server-verified total (security best practice)
             $cartStmt = $conn->prepare("
                 SELECT c.product_id, c.quantity, p.price, p.selling_price, p.stock, p.name 
@@ -503,7 +518,7 @@ switch ($method) {
                     throw new Exception($couponCheck['message']);
                 }
                 $discountAmount = floatval($couponCheck['discount']);
-                $couponId = intval($couponCheck['coupon']['id']);
+                $couponId = (int) $couponCheck['coupon']['id'];
                 $couponCode = strtoupper(trim($input['coupon_code']));
             }
 
@@ -541,11 +556,11 @@ switch ($method) {
                 $paymentMethod
             ]);
 
-            if ($couponId && $paymentMethod === 'cod') {
-                $conn->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$couponId]);
+            // Capture order id immediately after insert (before any other queries)
+            $orderId = (int) $conn->lastInsertId();
+            if ($orderId <= 0) {
+                throw new Exception("Could not create order record. Please try again.");
             }
-
-            $orderId = $conn->lastInsertId();
 
             // Insert order items
             $insertItemStmt = $conn->prepare("
@@ -555,10 +570,14 @@ switch ($method) {
             foreach ($itemsWithActivePrice as $item) {
                 $insertItemStmt->execute([
                     $orderId,
-                    $item['product_id'],
-                    $item['quantity'],
+                    (int) $item['product_id'],
+                    (int) $item['quantity'],
                     $item['price']
                 ]);
+            }
+
+            if ($couponId && $paymentMethod === 'cod') {
+                $conn->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$couponId]);
             }
 
             // COD: skip gateway, clear cart, return success
